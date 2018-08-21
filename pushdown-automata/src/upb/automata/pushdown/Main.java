@@ -9,6 +9,7 @@ public class Main {
 		State p = new State("p");
 		State q = new State("q");
 		State r = new State("r");
+		a.startStackSymbol = 'Z';
 		a.states = new ArrayList<State>();
 		a.states.add(p);
 		a.states.add(q);
@@ -17,14 +18,14 @@ public class Main {
 		a.finalStates.add(r);
 		a.startState = p;
 		a.transitionRelation = new ArrayList<TransitionFunction>();
-		a.transitionRelation.add(new TransitionFunction(p, '0', 'Z', p, 'A'));
-		a.transitionRelation.add(new TransitionFunction(p, '0', 'A', p, 'A'));
-		a.transitionRelation.add(new TransitionFunction(p, '1', 'A', q, '-'));
-		a.transitionRelation.add(new TransitionFunction(p, '-', 'A', q, '/'));
-		a.transitionRelation.add(new TransitionFunction(q, '1', 'A', q, '-'));
-		a.transitionRelation.add(new TransitionFunction(q, '-', 'Z', r, '/'));
+		a.transitionRelation.add(new TransitionFunction(p, 'a', 'Z', p, 'A'));
+		a.transitionRelation.add(new TransitionFunction(p, 'a', 'A', p, 'A'));
+		a.transitionRelation.add(new TransitionFunction(p, 'b', 'A', q, Automata.LAMBDA));
+		a.transitionRelation.add(new TransitionFunction(p, Automata.EPSILON, 'A', q, Automata.NOTHING));
+		a.transitionRelation.add(new TransitionFunction(q, 'b', 'A', q, Automata.LAMBDA));
+		a.transitionRelation.add(new TransitionFunction(q, Automata.EPSILON, 'Z', r, Automata.NOTHING));
 		Simulator s = new Simulator(a);
-		s.run("0011");
+		s.run("aaaabbbb");
 	}
 
 }

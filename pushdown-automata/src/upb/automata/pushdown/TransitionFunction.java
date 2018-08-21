@@ -22,10 +22,10 @@ public class TransitionFunction {
 	}
 	
 	public ArrayList<Character> modifyStack(ArrayList<Character> stack){
-		if (this.stackAction == '-') {
+		if (this.stackAction == Automata.LAMBDA) {
 			stack.remove(stack.size()-1);
 			return stack;
-		} else if(this.stackAction == '/') {
+		} else if(this.stackAction == Automata.NOTHING) {
 			return stack;
 		}
 		stack.add(this.stackAction);
