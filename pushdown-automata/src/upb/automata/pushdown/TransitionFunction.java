@@ -6,14 +6,14 @@ public class TransitionFunction {
 	State start;
 	Character input;
 	Character stackValue;
-	State end;
+	State step;
 	Character stackAction;
 	
-	TransitionFunction(State start, Character input, Character stackValue, State end, Character stackAction){
+	TransitionFunction(State start, Character input, Character stackValue, State step, Character stackAction){
 		this.start = start;
 		this.input = input;
 		this.stackValue = stackValue;
-		this.end = end;
+		this.step = step;
 		this.stackAction = stackAction;
 	}
 	
@@ -22,13 +22,14 @@ public class TransitionFunction {
 	}
 	
 	public ArrayList<Character> modifyStack(ArrayList<Character> stack){
+		ArrayList<Character> newStack = new ArrayList<Character>(stack);
 		if (this.stackAction == Automata.LAMBDA) {
-			stack.remove(stack.size()-1);
-			return stack;
+			newStack.remove(newStack.size()-1);
+			return newStack;
 		} else if(this.stackAction == Automata.NOTHING) {
-			return stack;
+			return newStack;
 		}
-		stack.add(this.stackAction);
-		return stack;
+		newStack.add(this.stackAction);
+		return newStack;
 	}
 }

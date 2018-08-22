@@ -8,38 +8,35 @@ public class Simulator {
 	public Simulator(Automata automata){
 		this.automata = automata;		
 	}
-	
-	public void run(String input) {
+	public void changeAutomata(Automata automata) {
+		this.automata = automata;		
+	}
+	public boolean run(String input) {
 		ArrayList<Character> stack = new ArrayList<Character>();
 		stack.add(this.automata.startStackSymbol);
-		this.verify(this.automata.startState, input, 0, stack);
+		System.out.print("Testing '" + input + "': ");
+		if (this.verify(this.automata.startState, input, stack)) {
+			System.out.println("Good");
+			return true;
+		}
+		System.out.println("Bad");
+		return false;
 	}
 	
-	public boolean verify(State state, String input, Integer index, ArrayList<Character> stack) {
-		Character i;
-		String inputLeft;
-		// If there isn't any chars left
-		if (index >= input.length()) {
-			i = Automata.EPSILON;
-			inputLeft = "";
-			if (this.automata.finalStates.indexOf(state) >= 0) {
-				return true;
-			} else if (stack.size() == 1){
+	public boolean verify(State state, String input, ArrayList<Character> stack) {
+		Character i = input.length() > 0? input.charAt(0) : Automata.EPSILON; 
+		Character z = stack.size() > 0? stack.get(stack.size()-1) : Automata.LAMBDA;
+		if (i == Automata.EPSILON) {
+			if (this.automata.finalStates.indexOf(state) >= 0 || z == Automata.LAMBDA) {
 				return true;
 			}
-		} else {
-			inputLeft = input.substring(index);
-			i = input.charAt(index);
 		}
-		Character z = stack.get(stack.size()-1);
-		System.out.println("Stack: " + stack.toString());
-		System.out.println("From: (" + state.id + ", " + inputLeft + ", " + z + ")");
-		for (int c = 0; c < this.automata.transitionRelation.size(); c++ ) {
-			TransitionFunction transition = this.automata.transitionRelation.get(c);
-			if (transition.check(state, i, z)) {
-				if (this.verify(transition.end, input, index + 1, new ArrayList<Character>(transition.modifyStack(stack)))) {
-					return true;
-				}
+		for (TransitionFunction transition : this.automata.transitionRelation) {
+			if ((transition.check(state, Automata.EPSILON, z) 
+					&& this.verify(transition.step, input, transition.modifyStack(stack)))
+					|| (i != Automata.EPSILON && transition.check(state, i, z) 
+					&& this.verify(transition.step, input.substring(1), transition.modifyStack(stack)))) {
+				return true;
 			}			
 		}
 		return false;
