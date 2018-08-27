@@ -4,11 +4,9 @@ import java.util.ArrayList;
 
 public class Simulator {
 	private Automata automata;
-	private boolean is2Stacks;
 	
 	public Simulator(){
 		this.automata = null;
-		this.is2Stacks = false;
 	}
 	
 	public Simulator(Automata automata){
@@ -16,15 +14,13 @@ public class Simulator {
 		if (automata.description != null) {
 			System.out.println("Using: '" + automata.description + "'");
 		}
-		this.is2Stacks = this.automata instanceof Automata2Stacks;
 	}
 	
 	public void setAutomata(Automata automata) {
 		this.automata = automata;
 		if (automata.description != null) {
 			System.out.println("Using: '" + automata.description + "'");
-		}
-		this.is2Stacks = this.automata instanceof Automata2Stacks;		
+		}		
 	}
 	
 	public boolean run(String input) {
