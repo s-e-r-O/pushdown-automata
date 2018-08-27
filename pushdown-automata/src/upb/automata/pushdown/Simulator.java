@@ -3,15 +3,31 @@ package upb.automata.pushdown;
 import java.util.ArrayList;
 
 public class Simulator {
-	Automata automata;
+	private Automata automata;
+
+	public Simulator(){
+		this.automata = null;		
+	}
 	
 	public Simulator(Automata automata){
-		this.automata = automata;		
+		this.automata = automata;
+		if (automata.description != null) {
+			System.out.println("Using: '" + automata.description + "'");
+		}
 	}
-	public void changeAutomata(Automata automata) {
-		this.automata = automata;		
+	
+	public void setAutomata(Automata automata) {
+		this.automata = automata;
+		if (automata.description != null) {
+			System.out.println("Using: '" + automata.description + "'");
+		}		
 	}
+	
 	public boolean run(String input) {
+		if (this.automata == null) {
+			System.out.println("Automata not defined");
+			return false;
+		}
 		ArrayList<Character> stack = new ArrayList<Character>();
 		stack.add(this.automata.startStackSymbol);
 		System.out.print("Testing '" + input + "': ");
