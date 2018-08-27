@@ -17,19 +17,22 @@ public class TransitionFunction {
 		this.stackAction = stackAction;
 	}
 	
-	public boolean check(State q, Character i, Character z) {
-		return q.equals(this.start) && i.equals(this.input) && z.equals(this.stackValue);
+	public boolean check(State q, Character i, Character[] z) {
+		return q.equals(this.start) && i.equals(this.input) && z[0].equals(this.stackValue);
 	}
 	
-	public ArrayList<Character> modifyStack(ArrayList<Character> stack){
-		ArrayList<Character> newStack = new ArrayList<Character>(stack);
+	public ArrayList<ArrayList<Character>> modifyStack(ArrayList<ArrayList<Character>> stacks){
+		ArrayList<ArrayList<Character>> newStacks = new ArrayList<ArrayList<Character>>();
+		ArrayList<Character> newStack = new ArrayList<Character>(stacks.get(0));	
 		if (this.stackAction == StackAction.REMOVE) {
 			newStack.remove(newStack.size()-1);
-			return newStack;
+			newStacks.add(newStack);
 		} else if(this.stackAction == StackAction.DO_NOTHING) {
-			return newStack;
+			newStacks.add(newStack);
+		} else {
+			newStack.add(this.stackAction);
+			newStacks.add(newStack);				
 		}
-		newStack.add(this.stackAction);
-		return newStack;
+		return newStacks;
 	}
 }

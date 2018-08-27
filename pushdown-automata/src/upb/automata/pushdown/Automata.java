@@ -13,5 +13,13 @@ public class Automata {
 	ArrayList<TransitionFunction> transitionRelation;
 	State startState;
 	Character startStackSymbol;
-	ArrayList<State> finalStates;	
+	ArrayList<State> finalStates;
+	
+	public ArrayList<ArrayList<Character>> initializeStack(){
+		ArrayList<ArrayList<Character>> stacks = new ArrayList<ArrayList<Character>>();
+		ArrayList<Character> stack = new ArrayList<Character>();
+		stack.add(this.startStackSymbol);
+		stacks.add(stack);
+		return stacks;
+	}
 }

@@ -13,6 +13,8 @@ public class Main {
 			s.run("aaabbb");
 			s.run("aab");
 			s.run("abbb");
+			s.run("abbbc");
+			s.run("aaabbbccc");
 		}
 	}
 }
