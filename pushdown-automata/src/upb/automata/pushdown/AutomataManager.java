@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
@@ -15,9 +16,10 @@ public class AutomataManager {
 	public static final String SAVE_FOLDER = "automata";
 	
 	Gson gson;
-	
+	File folder;
 	public AutomataManager() {
-		new File(AutomataManager.SAVE_FOLDER).mkdir();
+		this.folder = new File(AutomataManager.SAVE_FOLDER);
+		this.folder.mkdir();
 		this.gson = new Gson();
 	}
 	
@@ -46,6 +48,16 @@ public class AutomataManager {
 			System.out.println("The JSON automata '" + filename +"' can't be found");
 		}
 		return a;
+	}
+	
+	public ArrayList<Automata> loadAllAutomata() {
+		ArrayList<Automata> automata = new ArrayList<Automata>();
+		for (final File fileEntry : this.folder.listFiles()) {
+	        if (!fileEntry.isDirectory() && fileEntry.getName().endsWith(".json")) {
+	            automata.add(this.loadAutomata(fileEntry.getName()));
+	        }
+	    }
+		return automata;
 	}
 	
 	private String formatFilename(String filename) {

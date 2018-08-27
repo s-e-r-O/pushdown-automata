@@ -1,10 +1,18 @@
 package upb.automata.pushdown;
 
+import java.util.ArrayList;
+
 public class Main {
 	public static void main(String[] args) {
 		AutomataManager a = new AutomataManager();
-		Simulator s = new Simulator(a.loadAutomata("same_a_as_b"));
-		s.run("aaabbb");
-		s.run("abbb");
+		ArrayList<Automata> arr = a.loadAllAutomata();
+		Simulator s = new Simulator();
+		for(Automata automata : arr) {
+			s.setAutomata(automata);
+			s.run("aabbbb");
+			s.run("aaabbb");
+			s.run("aab");
+			s.run("abbb");
+		}
 	}
 }
