@@ -16,5 +16,6 @@ public class Main {
 			s.run("abbbc");
 			s.run("aaabbbccc");
 		}
+		MainFrame myFrame = new MainFrame();
 	}
 }
