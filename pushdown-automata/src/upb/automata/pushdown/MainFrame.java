@@ -5,12 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.SpinnerListModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainFrame extends JFrame{
 
@@ -21,11 +24,13 @@ public class MainFrame extends JFrame{
 	TextField textState = new TextField();
 	JButton addStates = new JButton();
 	String[] states = {};
+	List<String> statesList = new ArrayList<>();
 	JComboBox initialState = new JComboBox(states);
 
 	JLabel labelStates = new JLabel();
 	
 	String[] alphabet = {};
+	List<String> alphabetList = new ArrayList<>();
 	TextField textAlphabet = new TextField();
 	JButton addLetter = new JButton();
 	
@@ -34,6 +39,7 @@ public class MainFrame extends JFrame{
 	JSpinner numberOfPiles = new JSpinner(pileModel);
 	
 	String[] pileAlphabet = {};
+	List<String> pileAlphabetList = new ArrayList<>();
 	TextField textPileAlphabet = new TextField();
 	JButton addPileLetter = new JButton();
 	
@@ -41,8 +47,10 @@ public class MainFrame extends JFrame{
 	
 	JComboBox acceptedStates = new JComboBox(states);
 	String[] finalStates = {};
+	List<String> finalStatesList = new ArrayList<>();
+	
 	JButton addFinalState = new JButton();
-	JLabel finalStatesLabel = new JLabel();
+	JTextArea finalStatesLabel = new JTextArea();
 	
 	
 	public MainFrame() {
@@ -68,8 +76,10 @@ public class MainFrame extends JFrame{
 		addFinalState.setBounds(100, 150, 45, 20);
 		addFinalState.setText("+");
 		
-		finalStatesLabel.setBounds(25, 175, 200, 25);
-		finalStatesLabel.setText("Some final states");
+		finalStatesLabel.setBounds(25, 175, 200, 200);
+		finalStatesLabel.setText("Final States");
+		
+		setBehavior();
 		
 		myFrame.add(textState);
 		myFrame.add(addStates);
@@ -94,13 +104,47 @@ public class MainFrame extends JFrame{
 		
 	}
 	
-	public void iNeedHelp() {
+	public void setBehavior() {
 		addStates.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
-				finalStatesLabel.setText("Button Pressed");
-				System.out.println("123");
+				statesList.add(textState.getText());
+				states = statesList.toArray(states);
+//				for(String s : states)
+//				    System.out.println(s);
+				initialState.addItem(textState.getText());
+				acceptedStates.addItem(textState.getText());
 			}
 		});
+		
+		addLetter.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				alphabetList.add(textAlphabet.getText());
+				alphabet = alphabetList.toArray(alphabet);
+//				for(String s : states)
+//				    System.out.println(s);
+			}
+		});
+		
+		addPileLetter.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				pileAlphabetList.add(textPileAlphabet.getText());
+				pileAlphabet = pileAlphabetList.toArray(pileAlphabet);
+//				for(String s : states)
+//				    System.out.println(s);
+				initialPile.addItem(textPileAlphabet.getText());
+			}
+		});
+		
+		addFinalState.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				finalStatesList.add((String) acceptedStates.getSelectedItem());
+				finalStates = finalStatesList.toArray(finalStates);
+//				for(String s : states)
+//				    System.out.println(s);
+				finalStatesLabel.append("\n" + (String) acceptedStates.getSelectedItem());
+			}
+		});
+		
 	}
 
 }
