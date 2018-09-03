@@ -8,8 +8,8 @@ public class Automata {
 	
 	String description;
 	ArrayList<State> states;
-	ArrayList<Character> inputAlphabet;
-	ArrayList<Character> stackAlphabet;
+	ArrayList<ArrayList<Character>> inputAlphabet;
+	ArrayList<ArrayList<Character>> stackAlphabet;
 	ArrayList<TransitionFunction> transitionRelation;
 	State startState;
 	ArrayList<Character> startStackSymbols;
