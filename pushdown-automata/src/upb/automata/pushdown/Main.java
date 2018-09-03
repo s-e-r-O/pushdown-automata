@@ -10,6 +10,8 @@ public class Main {
 		for(Automata automata : arr) {
 			s.setAutomata(automata);
 			s.run("aabbbb");
+			System.out.println(s.getAllSteps().toString());
+			System.out.println(s.getCorrectSteps().toString());
 			s.run("aaabbb");
 			s.run("aab");
 			s.run("abbb");

@@ -1,12 +1,18 @@
 package upb.automata.pushdown;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Simulator {
 	private Automata automata;
+	private ArrayList<Step> correctSteps;
+	private ArrayList<Step> allSteps;
 	
 	public Simulator(){
 		this.automata = null;
+		this.correctSteps = new ArrayList<Step>();
+		this.allSteps = new ArrayList<Step>();
+		
 	}
 	
 	public Simulator(Automata automata){
@@ -14,6 +20,18 @@ public class Simulator {
 		if (automata.description != null) {
 			System.out.println("Using: '" + automata.description + "'");
 		}
+		this.correctSteps = new ArrayList<Step>();
+		this.allSteps = new ArrayList<Step>();
+	}
+	
+	public ArrayList<Step> getCorrectSteps(){
+		ArrayList<Step> reversed = new ArrayList<Step>(this.correctSteps);
+		Collections.reverse(reversed);
+		return reversed;
+	}
+
+	public ArrayList<Step> getAllSteps(){
+		return this.allSteps;
 	}
 	
 	public void setAutomata(Automata automata) {
@@ -28,6 +46,8 @@ public class Simulator {
 			System.out.println("Automata not defined");
 			return false;
 		}
+		this.allSteps.clear();
+		this.correctSteps.clear();
 		System.out.print("Testing '" + input + "': ");
 		if (this.verify(this.automata.startState, input, this.automata.initializeStack())) {
 			System.out.println("Good");
@@ -42,14 +62,17 @@ public class Simulator {
 		Character[] z = this.getLastValues(stacks);
 		if (i == Automata.EPSILON) {
 			if (this.automata.finalStates.indexOf(state) >= 0 || checkIfEmpty(z)) {
+				this.correctSteps.add(new Step(state, input, stacks));
 				return true;
 			}
 		}
 		for (TransitionFunction transition : this.automata.transitionRelation) {
+			this.allSteps.add(new Step(state, input, stacks, transition));
 			if ((transition.check(state, Automata.EPSILON, z) 
 					&& this.verify(transition.step, input, transition.modifyStack(stacks)))
 					|| (i != Automata.EPSILON && transition.check(state, i, z) 
 					&& this.verify(transition.step, input.substring(1), transition.modifyStack(stacks)))) {
+				this.correctSteps.add(new Step(state, input, stacks, transition));
 				return true;
 			}			
 		}
