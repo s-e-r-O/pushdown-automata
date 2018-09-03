@@ -5,6 +5,7 @@ public class State {
 	State(String id){
 		this.id = id;
 	}
+	
 	public boolean equals(Object o) {
 		if(!(o instanceof State))
 	        return false;

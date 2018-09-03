@@ -4,7 +4,6 @@ import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -13,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerListModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import upb.automata.pushdown.ui.SimulatorFrame;
 
@@ -25,13 +26,13 @@ public class MainFrame extends JFrame{
 	TextField textState = new TextField();
 	JButton addStates = new JButton();
 	String[] states = {};
-	List<String> statesList = new ArrayList<>();
+	ArrayList<String> statesList = new ArrayList<>();
 	JComboBox initialState = new JComboBox(states);
 
 	JLabel labelStates = new JLabel();
 	
 	String[] alphabet = {};
-	List<String> alphabetList = new ArrayList<>();
+	ArrayList<Character> alphabetList = new ArrayList<>();
 	TextField textAlphabet = new TextField();
 	JButton addLetter = new JButton();
 	
@@ -39,19 +40,40 @@ public class MainFrame extends JFrame{
 	SpinnerListModel pileModel = new SpinnerListModel(numbers);
 	JSpinner numberOfPiles = new JSpinner(pileModel);
 	
+	
+	
 	String[] pileAlphabet = {};
-	List<String> pileAlphabetList = new ArrayList<>();
+	ArrayList<Character> pileAlphabetList = new ArrayList<>();
 	TextField textPileAlphabet = new TextField();
 	JButton addPileLetter = new JButton();
 	
-	JComboBox initialPile = new JComboBox(pileAlphabet);
+	JComboBox[] initialPiles = {new JComboBox(pileAlphabet),new JComboBox(pileAlphabet),new JComboBox(pileAlphabet),new JComboBox(pileAlphabet)};
 	
 	JComboBox acceptedStates = new JComboBox(states);
 	String[] finalStates = {};
-	List<String> finalStatesList = new ArrayList<>();
+	ArrayList<String> finalStatesList = new ArrayList<>();
 	
 	JButton addFinalState = new JButton();
 	JTextArea finalStatesLabel = new JTextArea();
+	
+	JComboBox initialRuleState = new JComboBox(states);
+	JComboBox initialRuleAlphabet = new JComboBox(alphabet);
+	JComboBox initialRulePile = new JComboBox(pileAlphabet);
+	JComboBox finalRuleState = new JComboBox(states);
+	JComboBox finalRulePile = new JComboBox(pileAlphabet);
+	
+	JButton nextView = new JButton();
+
+	
+	//Automata Inputs
+	String description;
+	ArrayList<State> statesAutomaton;
+	ArrayList<TransitionFunction> transitionRelation;
+	ArrayList<ArrayList<Character>> stackAlphabet;
+	ArrayList<Character> startStackSymbols;
+	ArrayList<State> finalStatesAutomaton;
+	
+	
 	
 	
 	public MainFrame() {
@@ -72,13 +94,24 @@ public class MainFrame extends JFrame{
 		addPileLetter.setBounds(100,100,45,20);
 		addPileLetter.setText("+");
 		
-		initialPile.setBounds(25, 125, 50, 20);
+		initialPiles[0].setBounds(25, 125, 50, 20);
 		acceptedStates.setBounds(25, 150, 50, 20);
 		addFinalState.setBounds(100, 150, 45, 20);
 		addFinalState.setText("+");
 		
-		finalStatesLabel.setBounds(25, 175, 200, 200);
-		finalStatesLabel.setText("Final States");
+		finalStatesLabel.setBounds(300, 25, 200, 200);
+		finalStatesLabel.setText("Final States \u03BB");
+		
+
+		initialRuleState.setBounds(25, 325, 50, 20);
+		initialRuleAlphabet.setBounds(100, 325, 50, 20);
+		initialRulePile.setBounds(175, 325, 50, 20);
+		finalRuleState.setBounds(250, 325, 50, 20);
+		finalRulePile.setBounds(315, 325, 50, 20);
+		
+
+		nextView.setBounds(1300,600,100,20);
+		nextView.setText("Simulate");
 		
 		setBehavior();
 		
@@ -94,12 +127,23 @@ public class MainFrame extends JFrame{
 		myFrame.add(textPileAlphabet);
 		myFrame.add(addPileLetter);
 		
-		myFrame.add(initialPile);
+		myFrame.add(initialPiles[0]);
+		myFrame.add(initialPiles[1]);
+		myFrame.add(initialPiles[2]);
+		myFrame.add(initialPiles[3]);
 		myFrame.add(acceptedStates);
 		myFrame.add(addFinalState);
 		myFrame.add(finalStatesLabel);
 		
-		myFrame.setSize(500, 500);
+		myFrame.add(initialRuleState);
+		myFrame.add(initialRuleAlphabet);
+		myFrame.add(initialRulePile);
+		myFrame.add(finalRuleState);
+		myFrame.add(finalRulePile);
+
+		myFrame.add(nextView);
+		
+		myFrame.setSize(1500, 800);
 		myFrame.setLayout(null);
 		myFrame.setVisible(true);
 		
@@ -114,13 +158,31 @@ public class MainFrame extends JFrame{
 //				    System.out.println(s);
 				initialState.addItem(textState.getText());
 				acceptedStates.addItem(textState.getText());
+				initialRuleState.addItem(textState.getText());
+				finalRuleState.addItem(textState.getText());
+			}
+		});
+		
+		numberOfPiles.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+
+				System.out.println("click bitch");
+				
+				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+
+					initialPiles[i].setBounds(25 + 75*i, 125, 50, 20);
+				}
+
 			}
 		});
 		
 		addLetter.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
-				alphabetList.add(textAlphabet.getText());
+				alphabetList.add(textAlphabet.getText().toCharArray()[0]);
 				alphabet = alphabetList.toArray(alphabet);
+				initialRuleAlphabet.addItem(textAlphabet.getText());
 //				for(String s : states)
 //				    System.out.println(s);
 			}
@@ -128,11 +190,15 @@ public class MainFrame extends JFrame{
 		
 		addPileLetter.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
-				pileAlphabetList.add(textPileAlphabet.getText());
+				pileAlphabetList.add(textPileAlphabet.getText().toCharArray()[0]);
 				pileAlphabet = pileAlphabetList.toArray(pileAlphabet);
 //				for(String s : states)
 //				    System.out.println(s);
-				initialPile.addItem(textPileAlphabet.getText());
+				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+
+					initialPiles[i].addItem(textPileAlphabet.getText());
+				}
+				initialRulePile.addItem(textPileAlphabet.getText());
 			}
 		});
 		
@@ -145,6 +211,33 @@ public class MainFrame extends JFrame{
 				finalStatesLabel.append("\n" + (String) acceptedStates.getSelectedItem());
 			}
 		});
+		
+		nextView.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				for (String st : states) {
+					statesAutomaton.add(new State(st));
+					
+				}
+				
+				for (String fst : finalStates) {
+					finalStatesAutomaton.add(new State(fst));
+					
+				}
+				Automata auto = new Automata();
+				auto.states = statesAutomaton;
+				auto.inputAlphabet = alphabetList;
+				auto.stackAlphabet = stackAlphabet;
+				auto.transitionRelation = transitionRelation;
+				auto.startState = new State ((String) initialState.getSelectedItem());
+				auto.startStackSymbols = startStackSymbols;
+				auto.finalStates = finalStatesAutomaton;
+				
+				
+				
+			}
+		});
+		
+		
 		
 	}
 
