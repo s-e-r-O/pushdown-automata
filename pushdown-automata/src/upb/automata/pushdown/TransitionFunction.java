@@ -19,6 +19,10 @@ public class TransitionFunction {
 		this.stackActions = stackActions;
 	}
 	
+	public String toString() {
+		return "<" + this.start.id + ", " + this.input + ", " + Arrays.toString(this.stackValues) + ", " + this.step.id + ", " + Arrays.toString(this.stackActions) + ">";
+	}
+	
 	public boolean check(State q, Character i, Character[] z) {
 		return q.equals(this.start) && i.equals(this.input) && Arrays.equals(this.stackValues, z);
 	}
