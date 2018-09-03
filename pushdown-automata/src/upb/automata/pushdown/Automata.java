@@ -8,7 +8,7 @@ public class Automata {
 	
 	String description;
 	ArrayList<State> states;
-	ArrayList<ArrayList<Character>> inputAlphabet;
+	ArrayList<Character> inputAlphabet;
 	ArrayList<ArrayList<Character>> stackAlphabet;
 	ArrayList<TransitionFunction> transitionRelation;
 	State startState;

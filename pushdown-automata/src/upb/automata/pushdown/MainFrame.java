@@ -71,6 +71,7 @@ public class MainFrame extends JFrame{
 	String description;
 	ArrayList<State> statesAutomaton;
 	ArrayList<TransitionFunction> transitionRelation;
+	ArrayList<ArrayList<Character>> stackAlphabet;
 	ArrayList<Character> startStackSymbols;
 	ArrayList<State> finalStatesAutomaton;
 	
@@ -227,7 +228,7 @@ public class MainFrame extends JFrame{
 				Automata auto = new Automata();
 				auto.states = statesAutomaton;
 				auto.inputAlphabet = alphabetList;
-				auto.stackAlphabet = pileAlphabetList;
+				auto.stackAlphabet = stackAlphabet;
 				auto.transitionRelation = transitionRelation;
 				auto.startState = new State ((String) initialState.getSelectedItem());
 				auto.startStackSymbols = startStackSymbols;
