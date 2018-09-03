@@ -6,7 +6,7 @@ public class Automata {
 	public static final Character LAMBDA = '-';
 	public static final Character EPSILON = '-';
 	
-	String description;
+	public String description;
 	ArrayList<State> states;
 	ArrayList<ArrayList<Character>> inputAlphabet;
 	ArrayList<ArrayList<Character>> stackAlphabet;

@@ -3,6 +3,8 @@ package upb.automata.pushdown;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -12,8 +14,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerListModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import upb.automata.pushdown.ui.SimulatorFrame;
 
 public class MainFrame extends JFrame{
 

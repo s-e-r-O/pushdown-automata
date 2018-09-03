@@ -11,7 +11,11 @@ public class Step {
 	public Step(State state, String input, ArrayList<ArrayList<Character>> stacks, 
 			TransitionFunction futureTransitionFunction) {
 		this.state = state;
-		this.input = input;
+		if (input.length() > 0) {
+			this.input = input;			
+		} else {
+			this.input = ""+Automata.EPSILON;
+		}
 		this.stacks = stacks;
 		this.futureTransitionFunction = futureTransitionFunction;
 	}

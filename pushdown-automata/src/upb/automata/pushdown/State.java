@@ -11,4 +11,7 @@ public class State {
 	    State other = (State)o;
 		return other.id.equals(this.id);
 	}
+	public String toString() {
+		return this.id;
+	}
 }

@@ -17,9 +17,6 @@ public class Simulator {
 	
 	public Simulator(Automata automata){
 		this.automata = automata;
-		if (automata.description != null) {
-			System.out.println("Using: '" + automata.description + "'");
-		}
 		this.correctSteps = new ArrayList<Step>();
 		this.allSteps = new ArrayList<Step>();
 	}
@@ -48,13 +45,7 @@ public class Simulator {
 		}
 		this.allSteps.clear();
 		this.correctSteps.clear();
-		System.out.print("Testing '" + input + "': ");
-		if (this.verify(this.automata.startState, input, this.automata.initializeStack())) {
-			System.out.println("Good");
-			return true;
-		}
-		System.out.println("Bad");
-		return false;
+		return this.verify(this.automata.startState, input, this.automata.initializeStack());
 	}
 	
 	public boolean verify(State state, String input, ArrayList<ArrayList<Character>> stacks) {
