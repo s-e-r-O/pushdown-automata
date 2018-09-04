@@ -3,6 +3,8 @@ package upb.automata.pushdown;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import upb.automata.pushdown.util.Formatter;
+
 public class TransitionFunction {	
 	State start;
 	Character input;
@@ -20,7 +22,7 @@ public class TransitionFunction {
 	}
 	
 	public String toString() {
-		return "<" + this.start.id + ", " + this.input + ", " + Arrays.toString(this.stackValues) + ", " + this.step.id + ", " + Arrays.toString(this.stackActions) + ">";
+		return "< " + this.start.id + ", " + Formatter.inputToString(this.input) + ", " + Formatter.arrayToString(this.stackValues) + ", " + this.step.id + ", " + Formatter.actionToString(this.stackValues, this.stackActions) + " >";
 	}
 	
 	public boolean check(State q, Character i, Character[] z) {
