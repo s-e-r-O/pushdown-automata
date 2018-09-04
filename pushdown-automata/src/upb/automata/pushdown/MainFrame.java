@@ -69,6 +69,8 @@ public class MainFrame extends JFrame{
 	ArrayList<Character> initialRuleStacks = new ArrayList<Character>();
 	ArrayList<Character> finalRuleStacks = new ArrayList<Character>();
 	
+	int nStacks = 1;
+	
 	public MainFrame() {
 		super("Automata Editor");
 		this.setLayout(new GridBagLayout());
@@ -118,6 +120,11 @@ public class MainFrame extends JFrame{
 		button.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
 				saveAutomata();
+				automata = am.loadAllAutomata();
+				automataComboBox.removeAllItems();
+				for (Automata aut : automata) {
+					automataComboBox.addItem(aut);			
+				}
 			}
 		});
 		this.manager.add(button, c);
@@ -228,6 +235,12 @@ public class MainFrame extends JFrame{
 		c.gridx = 2;
 		c.gridy = 13;
 		
+		this.initialRuleStack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				stackTransition();
+			}
+		});
+		
 		this.add(this.initialRuleStack, c);
 		
 		
@@ -294,10 +307,10 @@ public class MainFrame extends JFrame{
 					statesList.add(textState.getText().trim());
 					initialState.addItem(textState.getText().trim());
 					finalStates.addItem(textState.getText().trim());
-					textState.setText("");
 					statesLabel.setText("  States: " + Formatter.arrayToString(statesList.toArray()));					
 					initialRuleState.addItem(textState.getText().trim());
 					finalRuleState.addItem(textState.getText().trim());
+					textState.setText("");
 				}
 			}
 		});
@@ -389,7 +402,7 @@ public class MainFrame extends JFrame{
 		c.insets = new Insets(10, 20, 20, 20);
 		button.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
-				if (checkEmptiness()) {
+				if (!checkEmptiness()) {
 					new SimulatorFrame(generateAutomata());					
 				}
 			}
@@ -403,6 +416,16 @@ public class MainFrame extends JFrame{
 	
 	public void loadAutomata() {
 		Automata a = (Automata) this.automataComboBox.getSelectedItem();
+		this.automata = this.am.loadAllAutomata();
+		automataComboBox.removeAllItems();
+		for (Automata aut : this.automata) {
+			this.automataComboBox.addItem(aut);			
+		}
+		if (a.transitionRelation.size() > 0) {
+			this.nStacks = a.transitionRelation.get(0).stackValues.length;			
+		} else {
+			this.nStacks = 1;
+		}
 		this.resetAll();
 		for (State s : a.states) {
 			this.statesList.add(s.id);
@@ -446,7 +469,7 @@ public class MainFrame extends JFrame{
 	}
 	
 	public void saveAutomata() {
-		if (checkEmptiness()) {
+		if (!checkEmptiness()) {
 			Automata a = generateAutomata();
 			this.am.saveAutomata(a, a.name);			
 		}
@@ -471,7 +494,9 @@ public class MainFrame extends JFrame{
 		auto.transitionRelation = this.transitionList;
 		auto.startState = new State ((String) initialState.getSelectedItem());
 		auto.startStackSymbols = new ArrayList<Character>();
-		auto.startStackSymbols.add((Character) this.initialStack.getSelectedItem());
+		for (int i = 0; i < nStacks; i++) {
+			auto.startStackSymbols.add((Character) this.initialStack.getSelectedItem());			
+		}
 		auto.finalStates = finalStatesAutomaton;
 		
 		return auto;
