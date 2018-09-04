@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import upb.automata.pushdown.Step;
@@ -78,11 +79,12 @@ public class StepViewer extends JPanel {
 				return false;
 			}
 		};
-		this.stacks.setColumnCount(0);
-		this.stacks.setRowCount(12);
 		
 		this.table = new JTable(stacks);
 		this.table.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+		this.table.setDefaultRenderer(Object.class, centerRenderer);
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridx = 0;
 		c.gridwidth = 2;
@@ -133,13 +135,19 @@ public class StepViewer extends JPanel {
 	
 	private void updateTable() {
 		this.stacks.setColumnCount(0);
+		this.stacks.setRowCount(0);
 		if (this.step != null) {
 			this.stacks.setColumnCount(this.step.stacks.size());
+			for (int i=0; i<this.step.stacks.size(); i++) {
+				if (this.stacks.getRowCount() < this.step.stacks.get(i).size() + 2) {
+					this.stacks.setRowCount(this.step.stacks.get(i).size() + 2);
+				}
+			}
 			for (int i=0; i<this.step.stacks.size(); i++) {
 				for (int j = 0; j < this.step.stacks.get(i).size(); j++) {
 					this.stacks.setValueAt(this.step.stacks.get(i).get(j), this.stacks.getRowCount() - 1 - j, i);
 				}
-			}			
+			}
 		}
 	}
 }

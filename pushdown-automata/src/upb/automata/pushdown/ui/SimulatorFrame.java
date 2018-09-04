@@ -38,6 +38,7 @@ public class SimulatorFrame extends JFrame {
 		this.setLayout(new GridBagLayout());
 		this.setTitle(automata.description);
 		this.setFocusable(true);
+		this.setFocusableWindowState(true);
 		this.steps = new ArrayList<Step>();
 		this.index = 0;
 		this.simulator = new Simulator(automata);
@@ -61,16 +62,10 @@ public class SimulatorFrame extends JFrame {
 			}
 
 			@Override
-			public void keyReleased(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void keyReleased(KeyEvent arg0) {}
 
 			@Override
-			public void keyTyped(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void keyTyped(KeyEvent arg0) {}
 		});
 		
 		this.inputField.addKeyListener(new KeyListener() {
@@ -82,16 +77,10 @@ public class SimulatorFrame extends JFrame {
 			}
 
 			@Override
-			public void keyReleased(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void keyReleased(KeyEvent arg0) {}
 
 			@Override
-			public void keyTyped(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void keyTyped(KeyEvent arg0) {}
 		});
 		this.add(inputField, c);
 		
@@ -121,6 +110,7 @@ public class SimulatorFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				getSteps();
+				requestFocus();
 			}
 			
 		});
@@ -169,6 +159,8 @@ public class SimulatorFrame extends JFrame {
 		
 		this.setSize(500, 500);
 		this.setVisible(true);
+		
+		inputField.requestFocus();
 	}
 	
 	public void run() {
