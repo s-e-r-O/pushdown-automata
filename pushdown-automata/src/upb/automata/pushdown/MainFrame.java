@@ -1,244 +1,378 @@
 package upb.automata.pushdown;
 
+import java.awt.Button;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextArea;
 import javax.swing.SpinnerListModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import upb.automata.pushdown.ui.SimulatorFrame;
+import upb.automata.pushdown.util.Formatter;
 
 public class MainFrame extends JFrame{
 
 	private static final long serialVersionUID = 1L;
 	
-	JFrame myFrame = new JFrame();
+	ArrayList<Automata> automata;
+	AutomataManager am;
 	
-	TextField textState = new TextField();
-	JButton addStates = new JButton();
-	String[] states = {};
-	ArrayList<String> statesList = new ArrayList<>();
-	JComboBox initialState = new JComboBox(states);
+	ArrayList<String> statesList;
+	ArrayList<Character> alphabetList;
+	ArrayList<Character> stackAlphabetList;
+	ArrayList<String> finalStatesList;
+	
+	JPanel manager;
+	JComboBox<Automata> automataComboBox;
+	TextField automataName;
+	TextField automataDescription;
 
-	JLabel labelStates = new JLabel();
+	TextField textState;
+	JComboBox<String> initialState;
+	JLabel statesLabel;
 	
-	String[] alphabet = {};
-	ArrayList<Character> alphabetList = new ArrayList<>();
-	TextField textAlphabet = new TextField();
-	JButton addLetter = new JButton();
+	TextField textAlphabet;
+	JLabel alphabetLabel;
 	
-	String[] numbers = {"1","2","3","4"};
-	SpinnerListModel pileModel = new SpinnerListModel(numbers);
-	JSpinner numberOfPiles = new JSpinner(pileModel);
+	JSpinner numberOfPiles;
 	
+	TextField textStackAlphabet;
+	JLabel stackAlphabetLabel;
+	JComboBox<Character> initialStack;
 	
+	JComboBox<String> finalStates;
+	JLabel finalStatesLabel;
 	
-	String[] pileAlphabet = {};
-	ArrayList<Character> pileAlphabetList = new ArrayList<>();
-	TextField textPileAlphabet = new TextField();
-	JButton addPileLetter = new JButton();
-	
-	JComboBox[] initialPiles = {new JComboBox(pileAlphabet),new JComboBox(pileAlphabet),new JComboBox(pileAlphabet),new JComboBox(pileAlphabet)};
-	
-	JComboBox acceptedStates = new JComboBox(states);
-	String[] finalStates = {};
-	ArrayList<String> finalStatesList = new ArrayList<>();
-	
-	JButton addFinalState = new JButton();
-	JTextArea finalStatesLabel = new JTextArea();
-	
-	JComboBox initialRuleState = new JComboBox(states);
-	JComboBox initialRuleAlphabet = new JComboBox(alphabet);
-	JComboBox initialRulePile = new JComboBox(pileAlphabet);
-	JComboBox finalRuleState = new JComboBox(states);
-	JComboBox finalRulePile = new JComboBox(pileAlphabet);
-	
-	JButton nextView = new JButton();
-
-	
-	//Automata Inputs
-	String description;
-	ArrayList<State> statesAutomaton;
-	ArrayList<TransitionFunction> transitionRelation;
-	ArrayList<ArrayList<Character>> stackAlphabet;
-	ArrayList<Character> startStackSymbols;
-	ArrayList<State> finalStatesAutomaton;
-	
-	
-	
+//	JComboBox initialRuleState = new JComboBox(states);
+//	JComboBox initialRuleAlphabet = new JComboBox(alphabet);
+//	JComboBox initialRulePile = new JComboBox(stackAlphabet);
+//	JComboBox finalRuleState = new JComboBox(states);
+//	JComboBox finalRulePile = new JComboBox(stackAlphabet);
+//	
+// 	JButton nextView = new JButton();
 	
 	public MainFrame() {
+		super("Automata Editor");
+		this.setLayout(new GridBagLayout());
 		
+		this.am = new AutomataManager();
+		this.statesList = new ArrayList<String>();
+		this.stackAlphabetList = new ArrayList<Character>();
+		this.alphabetList = new ArrayList<Character>();
+		this.finalStatesList = new ArrayList<>();
+		this.automata = this.am.loadAllAutomata();
+				
+		GridBagConstraints c = new GridBagConstraints();
 		
-		textState.setBounds(25, 25, 50, 20);
-		addStates.setBounds(100, 25, 45, 20);
-		addStates.setText("+");
-		initialState.setBounds(170, 25, 50, 20);
+		this.manager = new JPanel(new GridBagLayout());
+		this.manager.setBorder(BorderFactory.createEtchedBorder());
+		this.automataComboBox = new JComboBox<Automata>();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		c.weightx = 0.5;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(10,10,10,10);
+		for(Automata a : this.automata) {
+			this.automataComboBox.addItem(a);			
+		}
+		this.manager.add(this.automataComboBox, c);
 		
-		textAlphabet.setBounds(25,50,50,20);
-		addLetter.setBounds(100,50,45,20);
-		addLetter.setText("+");
+		Button button = new Button("Load");
+		c.gridx = 2;
+		c.gridy = 0;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				loadAutomata();
+			}
+		});
+		this.manager.add(button, c);
 		
-		numberOfPiles.setBounds(25, 75, 50, 20);
+		button = new Button("Save");
+		c.gridx = 2;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				saveAutomata();
+			}
+		});
+		this.manager.add(button, c);
 		
-		textPileAlphabet.setBounds(25, 100, 50, 20);
-		addPileLetter.setBounds(100,100,45,20);
-		addPileLetter.setText("+");
+		this.automataName = new TextField();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		this.manager.add(this.automataName, c);
 		
-		initialPiles[0].setBounds(25, 125, 50, 20);
-		acceptedStates.setBounds(25, 150, 50, 20);
-		addFinalState.setBounds(100, 150, 45, 20);
-		addFinalState.setText("+");
+		c = new GridBagConstraints();
 		
-		finalStatesLabel.setBounds(300, 25, 200, 200);
-		finalStatesLabel.setText("Final States \u03BB");
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 3;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.insets = new Insets(20,20,20,20);
+		this.add(this.manager, c);
 		
+		this.automataDescription = new TextField();
+		
+		JLabel[] labels = new JLabel[] {
+			new JLabel("Add to States:", JLabel.RIGHT),
+			new JLabel("", JLabel.RIGHT),
+			new JLabel("Initial State:", JLabel.RIGHT),
+			new JLabel("Add to Alphabet:", JLabel.RIGHT),
+			new JLabel("", JLabel.RIGHT),
+			new JLabel("Number of Stacks:", JLabel.RIGHT),
+			new JLabel("Add to Alphabet of Stacks:", JLabel.RIGHT),
+			new JLabel("", JLabel.RIGHT),
+			new JLabel("Initial Value of Stacks:", JLabel.RIGHT),
+			new JLabel("Add to Final States:", JLabel.RIGHT),
+		};
+		
+		c.anchor = GridBagConstraints.CENTER;
+		c.gridx = 0;
+		c.ipady = 0;
+		c.ipadx = 0;
+		c.gridwidth = 1;
+		c.weightx = 0;
+		c.insets = new Insets(10,20,0,20);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		
+		for (int i = 0; i < labels.length; i++) {
+			labels[i].setFont(new Font("Verdana", Font.BOLD, 12));
+			c.gridy = i+1;
+			c.weighty = 0.1;
+			this.add(labels[i], c);
+		}
+		
+		this.textState = new TextField();
+		c.gridx = 1;
+		c.gridy = 1;
+		c.weightx = 0.5;
+		
+		this.add(this.textState, c);
+		
+		this.initialState = new JComboBox<String>();
+		c.gridy = 3;
+		
+		this.add(this.initialState, c);
+		
+		this.textAlphabet = new TextField();
+		c.gridy = 4;
+		
+		this.add(this.textAlphabet, c);
+		
+		SpinnerListModel stackModel = new SpinnerListModel(new Integer[] {1, 2, 3, 4});
+		this.numberOfPiles = new JSpinner(stackModel);
+		c.gridy = 6;
+		this.add(this.numberOfPiles, c);
 
-		initialRuleState.setBounds(25, 325, 50, 20);
-		initialRuleAlphabet.setBounds(100, 325, 50, 20);
-		initialRulePile.setBounds(175, 325, 50, 20);
-		finalRuleState.setBounds(250, 325, 50, 20);
-		finalRulePile.setBounds(315, 325, 50, 20);
+		this.textStackAlphabet = new TextField();
+		c.gridy = 7;
 		
+		this.add(this.textStackAlphabet, c);
+		
+		this.initialStack = new JComboBox<Character>();
+		c.gridy = 9;
+		
+		this.add(this.initialStack, c);
+		
+		this.finalStates = new JComboBox<String>();
+		c.gridy = 10;
+		
+		this.add(this.finalStates, c);
+		
+		this.statesLabel = new JLabel("  States:", JLabel.LEFT);
+		this.statesLabel.setBorder(BorderFactory.createEtchedBorder());
+		this.statesLabel.setFont(new Font("Verdana", Font.PLAIN, 14));
+		c.gridx = 0;
+		c.gridwidth = 3;
+		c.gridy = 2;
+		c.ipady = 20;
+		
+		this.add(this.statesLabel, c);
+		
+		this.alphabetLabel = new JLabel("  Alphabet:", JLabel.LEFT);
+		this.alphabetLabel.setBorder(BorderFactory.createEtchedBorder());
+		this.alphabetLabel.setFont(new Font("Verdana", Font.PLAIN, 14));
+		c.gridy = 5;
+		
+		this.add(this.alphabetLabel, c);
 
-		nextView.setBounds(1300,600,100,20);
-		nextView.setText("Simulate");
+		this.stackAlphabetLabel = new JLabel("  Stack Alphabet:", JLabel.LEFT);
+		this.stackAlphabetLabel.setBorder(BorderFactory.createEtchedBorder());
+		this.stackAlphabetLabel.setFont(new Font("Verdana", Font.PLAIN, 14));
+		c.gridy = 8;
 		
-		setBehavior();
-		
-		myFrame.add(textState);
-		myFrame.add(addStates);
-		myFrame.add(initialState);
-		
-		myFrame.add(textAlphabet);
-		myFrame.add(addLetter);
-		
-		myFrame.add(numberOfPiles);
-		
-		myFrame.add(textPileAlphabet);
-		myFrame.add(addPileLetter);
-		
-		myFrame.add(initialPiles[0]);
-		myFrame.add(initialPiles[1]);
-		myFrame.add(initialPiles[2]);
-		myFrame.add(initialPiles[3]);
-		myFrame.add(acceptedStates);
-		myFrame.add(addFinalState);
-		myFrame.add(finalStatesLabel);
-		
-		myFrame.add(initialRuleState);
-		myFrame.add(initialRuleAlphabet);
-		myFrame.add(initialRulePile);
-		myFrame.add(finalRuleState);
-		myFrame.add(finalRulePile);
+		this.add(this.stackAlphabetLabel, c);
 
-		myFrame.add(nextView);
+		this.finalStatesLabel = new JLabel("  Final States:", JLabel.LEFT);
+		this.finalStatesLabel.setBorder(BorderFactory.createEtchedBorder());
+		this.finalStatesLabel.setFont(new Font("Verdana", Font.PLAIN, 14));
+		c.gridy = 11;
 		
-		myFrame.setSize(1500, 800);
-		myFrame.setLayout(null);
-		myFrame.setVisible(true);
+		this.add(this.finalStatesLabel, c);
+		
+		button = new Button("Add");
+		c.gridx = 2;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		c.weightx = 0.2;
+		c.ipady = 5;
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				if (textState.getText().trim().length() > 0 && !statesList.contains(textState.getText().trim())) {
+					statesList.add(textState.getText().trim());
+					initialState.addItem(textState.getText().trim());
+					finalStates.addItem(textState.getText().trim());
+					textState.setText("");
+					statesLabel.setText("  States: " + Formatter.arrayToString(statesList.toArray()));					
+	//				initialRuleState.addItem(textState.getText());
+	//				finalRuleState.addItem(textState.getText());
+				}
+			}
+		});
+		this.add(button, c);
+		
+		button = new Button("Add");
+		c.gridy = 4;
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				if (textAlphabet.getText().trim().length() > 0 && !alphabetList.contains(textAlphabet.getText().trim().toLowerCase().toCharArray()[0])) {
+					Character c = textAlphabet.getText().trim().toLowerCase().toCharArray()[0];
+					if (c != Automata.EPSILON && c != StackAction.DO_NOTHING) {
+						alphabetList.add(c);
+						alphabetLabel.setText("  Alphabet: " + Formatter.arrayToString(alphabetList.toArray()));						
+					}
+					textAlphabet.setText("");
+	//				initialRuleAlphabet.addItem(textAlphabet.getText());
+				}
+			}
+		});
+		this.add(button, c);
+		
+		button = new Button("Add");
+		c.gridy = 6;
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				if (textStackAlphabet.getText().trim().length() > 0 && !stackAlphabetList.contains(textStackAlphabet.getText().trim().toUpperCase().toCharArray()[0])) {
+					Character c = textStackAlphabet.getText().trim().toUpperCase().toCharArray()[0];
+					if (c != StackAction.REMOVE && c != StackAction.DO_NOTHING) {
+						stackAlphabetList.add(c);
+						initialStack.addItem(c);
+						stackAlphabetLabel.setText(" Stack Alphabet: " + Formatter.arrayToString(stackAlphabetList.toArray()));						
+					}
+					textStackAlphabet.setText("");
+	//				initialRulePile.addItem(textStackAlphabet.getText());
+				}
+			}
+		});
+		this.add(button, c);
+		
+		button = new Button("Add");
+		c.gridy = 10;
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				finalStatesList.add((String) finalStates.getSelectedItem());
+				finalStatesLabel.setText("  Final States: " + Formatter.arrayToString(finalStatesList.toArray()));
+			}
+		});
+		this.add(button, c);
+
+		button = new Button("Play");
+		c.gridx = 1;
+		c.gridwidth = 2;
+		c.gridy = 12;
+		c.ipady = 10;
+		c.insets = new Insets(10, 20, 20, 20);
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+			}
+		});
+		this.add(button, c);
+				
+		this.setSize(500, 700);
+		this.setVisible(true);
 		
 	}
 	
-	public void setBehavior() {
-		addStates.addActionListener(new ActionListener(){  
-			public void actionPerformed(ActionEvent e){
-				statesList.add(textState.getText());
-				states = statesList.toArray(states);
-//				for(String s : states)
-//				    System.out.println(s);
-				initialState.addItem(textState.getText());
-				acceptedStates.addItem(textState.getText());
-				initialRuleState.addItem(textState.getText());
-				finalRuleState.addItem(textState.getText());
-			}
-		});
+	public void loadAutomata() {
+		Automata a = (Automata) this.automataComboBox.getSelectedItem();
+		this.resetAll();
 		
-		numberOfPiles.addChangeListener(new ChangeListener() {
+		for (State s : a.states) {
+			this.statesList.add(s.id);
+			this.initialState.addItem(s.id);
+			this.finalStates.addItem(s.id);
+		}
+		this.alphabetList = a.inputAlphabet;
+		this.stackAlphabetList = a.stackAlphabet.get(0);
+		for (State s : a.finalStates) {
+			this.finalStatesList.add(s.id);
+		}
+		for (Character s : a.stackAlphabet.get(0)) {
+			this.initialStack.addItem(s);
+		}
+		this.automataName.setText(a.name);
+		this.automataDescription.setText(a.description);
+		this.initialState.setSelectedItem(a.startState.id);
+		this.statesLabel.setText("  States: " + Formatter.arrayToString(statesList.toArray()));	
+		alphabetLabel.setText("  Alphabet: " + Formatter.arrayToString(alphabetList.toArray()));
+		stackAlphabetLabel.setText(" Stack Alphabet: " + Formatter.arrayToString(stackAlphabetList.toArray()));
 
-			@Override
-			public void stateChanged(ChangeEvent e) {
+		this.initialStack.setSelectedItem(a.startStackSymbols.get(0));
+		finalStatesLabel.setText("  Final States: " + Formatter.arrayToString(finalStatesList.toArray()));
+	}
+	
+	public void saveAutomata() {
+		
+	}
+	
+	public Automata generateAutomata() {
+		Automata a = new Automata();
+		return a;
+	}
+	
+	public void resetAll() {
+		this.statesList.clear();
+		this.alphabetList.clear();
+		this.stackAlphabetList.clear();
+		this.finalStatesList.clear();
+		
+		this.automataName.setText("");
+		this.automataDescription.setText("");
 
-				System.out.println("click bitch");
-				
-				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
-
-					initialPiles[i].setBounds(25 + 75*i, 125, 50, 20);
-				}
-
-			}
-		});
+		this.textState.setText("");
+		this.initialState.removeAll();
+		this.statesLabel.setText("  States:");
 		
-		addLetter.addActionListener(new ActionListener(){  
-			public void actionPerformed(ActionEvent e){
-				alphabetList.add(textAlphabet.getText().toCharArray()[0]);
-				alphabet = alphabetList.toArray(alphabet);
-				initialRuleAlphabet.addItem(textAlphabet.getText());
-//				for(String s : states)
-//				    System.out.println(s);
-			}
-		});
+		this.textAlphabet.setText("");
+		this.alphabetLabel.setText("  Alphabet:");
 		
-		addPileLetter.addActionListener(new ActionListener(){  
-			public void actionPerformed(ActionEvent e){
-				pileAlphabetList.add(textPileAlphabet.getText().toCharArray()[0]);
-				pileAlphabet = pileAlphabetList.toArray(pileAlphabet);
-//				for(String s : states)
-//				    System.out.println(s);
-				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
-
-					initialPiles[i].addItem(textPileAlphabet.getText());
-				}
-				initialRulePile.addItem(textPileAlphabet.getText());
-			}
-		});
+		this.numberOfPiles.setValue(1);;
 		
-		addFinalState.addActionListener(new ActionListener(){  
-			public void actionPerformed(ActionEvent e){
-				finalStatesList.add((String) acceptedStates.getSelectedItem());
-				finalStates = finalStatesList.toArray(finalStates);
-//				for(String s : states)
-//				    System.out.println(s);
-				finalStatesLabel.append("\n" + (String) acceptedStates.getSelectedItem());
-			}
-		});
+		this.textStackAlphabet.setText("");
+		this.stackAlphabetLabel.setText("  Stack Alphabet:");
+		this.initialStack.removeAll();
 		
-		nextView.addActionListener(new ActionListener(){  
-			public void actionPerformed(ActionEvent e){
-				for (String st : states) {
-					statesAutomaton.add(new State(st));
-					
-				}
-				
-				for (String fst : finalStates) {
-					finalStatesAutomaton.add(new State(fst));
-					
-				}
-				Automata auto = new Automata();
-				auto.states = statesAutomaton;
-				auto.inputAlphabet = alphabetList;
-				auto.stackAlphabet = stackAlphabet;
-				auto.transitionRelation = transitionRelation;
-				auto.startState = new State ((String) initialState.getSelectedItem());
-				auto.startStackSymbols = startStackSymbols;
-				auto.finalStates = finalStatesAutomaton;
-				
-				
-				
-			}
-		});
-		
-		
-		
+		this.finalStates.removeAll();
+		this.finalStatesLabel.setText("  Final States:");
 	}
 
 }
