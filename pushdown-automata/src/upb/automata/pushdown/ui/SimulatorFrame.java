@@ -36,7 +36,7 @@ public class SimulatorFrame extends JFrame {
 	public SimulatorFrame(Automata automata) {
 		super();
 		this.setLayout(new GridBagLayout());
-		this.setTitle(automata.description);
+		this.setTitle(automata.name);
 		this.setFocusable(true);
 		this.setFocusableWindowState(true);
 		this.steps = new ArrayList<Step>();

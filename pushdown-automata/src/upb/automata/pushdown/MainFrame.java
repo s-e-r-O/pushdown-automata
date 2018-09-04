@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerListModel;
 
+import upb.automata.pushdown.ui.SimulatorFrame;
 import upb.automata.pushdown.util.Formatter;
 
 public class MainFrame extends JFrame{
@@ -32,6 +33,7 @@ public class MainFrame extends JFrame{
 	ArrayList<Character> alphabetList;
 	ArrayList<Character> stackAlphabetList;
 	ArrayList<String> finalStatesList;
+	ArrayList<TransitionFunction> transitionList;
 	
 	JPanel manager;
 	JComboBox<Automata> automataComboBox;
@@ -54,13 +56,18 @@ public class MainFrame extends JFrame{
 	JComboBox<String> finalStates;
 	JLabel finalStatesLabel;
 	
-//	JComboBox initialRuleState = new JComboBox(states);
-//	JComboBox initialRuleAlphabet = new JComboBox(alphabet);
-//	JComboBox initialRulePile = new JComboBox(stackAlphabet);
-//	JComboBox finalRuleState = new JComboBox(states);
-//	JComboBox finalRulePile = new JComboBox(stackAlphabet);
-//	
-// 	JButton nextView = new JButton();
+	JComboBox<String> initialRuleState;
+	JComboBox<Character> initialRuleAlphabet;
+	JComboBox<Character> initialRuleStack;
+	JComboBox<String> finalRuleState;
+	JComboBox<StackAction> finalRuleStackAction;
+
+	JLabel rulesLabel;
+
+	JButton addTransition = new JButton();
+
+	ArrayList<Character> initialRuleStacks = new ArrayList<Character>();
+	ArrayList<Character> finalRuleStacks = new ArrayList<Character>();
 	
 	public MainFrame() {
 		super("Automata Editor");
@@ -70,7 +77,9 @@ public class MainFrame extends JFrame{
 		this.statesList = new ArrayList<String>();
 		this.stackAlphabetList = new ArrayList<Character>();
 		this.alphabetList = new ArrayList<Character>();
-		this.finalStatesList = new ArrayList<>();
+		this.finalStatesList = new ArrayList<String>();
+		this.transitionList = new ArrayList<TransitionFunction>();
+		
 		this.automata = this.am.loadAllAutomata();
 				
 		GridBagConstraints c = new GridBagConstraints();
@@ -124,7 +133,7 @@ public class MainFrame extends JFrame{
 		
 		c.gridx = 0;
 		c.gridy = 0;
-		c.gridwidth = 3;
+		c.gridwidth = 12;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
 		c.insets = new Insets(20,20,20,20);
@@ -143,6 +152,8 @@ public class MainFrame extends JFrame{
 			new JLabel("", JLabel.RIGHT),
 			new JLabel("Initial Value of Stacks:", JLabel.RIGHT),
 			new JLabel("Add to Final States:", JLabel.RIGHT),
+			new JLabel("", JLabel.RIGHT),
+			new JLabel("Add Rules:", JLabel.LEFT)
 		};
 		
 		c.anchor = GridBagConstraints.CENTER;
@@ -163,6 +174,8 @@ public class MainFrame extends JFrame{
 		
 		this.textState = new TextField();
 		c.gridx = 1;
+		c.gridwidth = 7;
+		
 		c.gridy = 1;
 		c.weightx = 0.5;
 		
@@ -198,11 +211,49 @@ public class MainFrame extends JFrame{
 		
 		this.add(this.finalStates, c);
 		
+		this.initialRuleState = new JComboBox<String>();
+		c.gridx = 0;
+		c.gridwidth = 1;
+		c.gridy = 13;
+
+		this.add(this.initialRuleState, c);
+		
+		this.initialRuleAlphabet = new JComboBox<Character>();
+		c.gridx = 1;
+		c.gridy = 13;
+
+		this.add(this.initialRuleAlphabet, c);
+		
+		this.initialRuleStack = new JComboBox<Character>();
+		
+		initialRuleStack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				stackTransition();
+			}
+		});
+		
+		c.gridx = 2;
+		c.gridy = 13;
+
+		this.add(this.initialRuleStack, c);
+		
+		this.finalRuleState = new JComboBox<String>();
+		c.gridx = 3;
+		c.gridy = 13;
+
+		this.add(this.finalRuleState, c);
+		
+		this.finalRuleStackAction = new JComboBox<StackAction>();
+		c.gridx = 4;
+		c.gridy = 13;
+
+		this.add(this.finalRuleStackAction, c);
+
 		this.statesLabel = new JLabel("  States:", JLabel.LEFT);
 		this.statesLabel.setBorder(BorderFactory.createEtchedBorder());
 		this.statesLabel.setFont(new Font("Verdana", Font.PLAIN, 14));
 		c.gridx = 0;
-		c.gridwidth = 3;
+		c.gridwidth = 12;
 		c.gridy = 2;
 		c.ipady = 20;
 		
@@ -229,10 +280,18 @@ public class MainFrame extends JFrame{
 		
 		this.add(this.finalStatesLabel, c);
 		
+
+		this.rulesLabel = new JLabel("  Rules:", JLabel.LEFT);
+		this.rulesLabel.setBorder(BorderFactory.createEtchedBorder());
+		this.rulesLabel.setFont(new Font("Verdana", Font.PLAIN, 14));
+		c.gridy = 14;
+		
+		this.add(this.rulesLabel, c);
+		
 		button = new Button("Add");
-		c.gridx = 2;
+		c.gridx = 9;
 		c.gridy = 1;
-		c.gridwidth = 1;
+		c.gridwidth = 3;
 		c.weightx = 0.2;
 		c.ipady = 5;
 		button.addActionListener(new ActionListener(){  
@@ -243,8 +302,8 @@ public class MainFrame extends JFrame{
 					finalStates.addItem(textState.getText().trim());
 					textState.setText("");
 					statesLabel.setText("  States: " + Formatter.arrayToString(statesList.toArray()));					
-	//				initialRuleState.addItem(textState.getText());
-	//				finalRuleState.addItem(textState.getText());
+					initialRuleState.addItem(textState.getText().trim());
+					finalRuleState.addItem(textState.getText().trim());
 				}
 			}
 		});
@@ -259,16 +318,17 @@ public class MainFrame extends JFrame{
 					if (c != Automata.EPSILON && c != StackAction.DO_NOTHING) {
 						alphabetList.add(c);
 						alphabetLabel.setText("  Alphabet: " + Formatter.arrayToString(alphabetList.toArray()));						
+						initialRuleAlphabet.addItem(c);
+						
 					}
 					textAlphabet.setText("");
-	//				initialRuleAlphabet.addItem(textAlphabet.getText());
 				}
 			}
 		});
 		this.add(button, c);
 		
 		button = new Button("Add");
-		c.gridy = 6;
+		c.gridy = 7;
 		button.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
 				if (textStackAlphabet.getText().trim().length() > 0 && !stackAlphabetList.contains(textStackAlphabet.getText().trim().toUpperCase().toCharArray()[0])) {
@@ -277,9 +337,10 @@ public class MainFrame extends JFrame{
 						stackAlphabetList.add(c);
 						initialStack.addItem(c);
 						stackAlphabetLabel.setText(" Stack Alphabet: " + Formatter.arrayToString(stackAlphabetList.toArray()));						
+						initialRuleStack.addItem(c);
+						stackTransition();
 					}
 					textStackAlphabet.setText("");
-	//				initialRulePile.addItem(textStackAlphabet.getText());
 				}
 			}
 		});
@@ -289,8 +350,39 @@ public class MainFrame extends JFrame{
 		c.gridy = 10;
 		button.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
-				finalStatesList.add((String) finalStates.getSelectedItem());
-				finalStatesLabel.setText("  Final States: " + Formatter.arrayToString(finalStatesList.toArray()));
+				if (finalStates.getSelectedItem() != null) {
+					finalStatesList.add((String) finalStates.getSelectedItem());
+					finalStatesLabel.setText("  Final States: " + Formatter.arrayToString(finalStatesList.toArray()));					
+				}
+			}
+		});
+		this.add(button, c);
+
+		button = new Button("Add");
+		c.gridy = 13;
+		button.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+//				if (initialRuleStacks != null) {
+//					initialRuleStacks.clear();					
+//				}
+//				if (finalRuleStacks != null) {
+//					finalRuleStacks.clear();					
+//				}
+//				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+//					initialRuleStacks.add(initialRulePile[i].getSelectedItem().toString().charAt(0));
+//				}
+//				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+//					finalRuleStacks.add(((StackAction) finalRulePile[i].getSelectedItem()).action);
+//				}
+				transitionList.add(new TransitionFunction(
+						new State( initialRuleState.getSelectedItem().toString()),
+						initialRuleAlphabet.getSelectedItem().toString().charAt(0), 
+						//initialRuleStacks.toArray(new Character[finalRuleStacks.size()]),
+						new Character[] {(Character)initialRuleStack.getSelectedItem()},
+						new State( finalRuleState.getSelectedItem().toString()),
+						//finalRuleStacks.toArray(new Character[finalRuleStacks.size()])));
+						new Character[] {((StackAction)finalRuleStackAction.getSelectedItem()).action}));
+				rulesLabel.setText("  Rules: " + Formatter.arrayToString(transitionList.toArray()));
 			}
 		});
 		this.add(button, c);
@@ -298,11 +390,12 @@ public class MainFrame extends JFrame{
 		button = new Button("Play");
 		c.gridx = 1;
 		c.gridwidth = 2;
-		c.gridy = 12;
+		c.gridy = 15;
 		c.ipady = 10;
 		c.insets = new Insets(10, 20, 20, 20);
 		button.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
+				new SimulatorFrame(generateAutomata());
 			}
 		});
 		this.add(button, c);
@@ -315,19 +408,24 @@ public class MainFrame extends JFrame{
 	public void loadAutomata() {
 		Automata a = (Automata) this.automataComboBox.getSelectedItem();
 		this.resetAll();
-		
 		for (State s : a.states) {
 			this.statesList.add(s.id);
 			this.initialState.addItem(s.id);
 			this.finalStates.addItem(s.id);
+			this.initialRuleState.addItem(s.id);
+			this.finalRuleState.addItem(s.id);
 		}
 		this.alphabetList = a.inputAlphabet;
 		this.stackAlphabetList = a.stackAlphabet.get(0);
 		for (State s : a.finalStates) {
 			this.finalStatesList.add(s.id);
 		}
+		for (Character s : a.inputAlphabet) {
+			this.initialRuleAlphabet.addItem(s);
+		}
 		for (Character s : a.stackAlphabet.get(0)) {
 			this.initialStack.addItem(s);
+			this.initialRuleStack.addItem(s);
 		}
 		this.automataName.setText(a.name);
 		this.automataDescription.setText(a.description);
@@ -336,17 +434,50 @@ public class MainFrame extends JFrame{
 		alphabetLabel.setText("  Alphabet: " + Formatter.arrayToString(alphabetList.toArray()));
 		stackAlphabetLabel.setText(" Stack Alphabet: " + Formatter.arrayToString(stackAlphabetList.toArray()));
 
+//		initialRulePile[0].addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				stackTransition();
+//			}
+//		});
+		
 		this.initialStack.setSelectedItem(a.startStackSymbols.get(0));
 		finalStatesLabel.setText("  Final States: " + Formatter.arrayToString(finalStatesList.toArray()));
+		stackTransition();
+		
+		this.transitionList = a.transitionRelation;
+		rulesLabel.setText("  Rules: " + Formatter.arrayToString(transitionList.toArray()));
 	}
 	
 	public void saveAutomata() {
-		
+		Automata a = generateAutomata();
+		this.am.saveAutomata(a, a.name);
 	}
 	
 	public Automata generateAutomata() {
-		Automata a = new Automata();
-		return a;
+		Automata auto = new Automata();
+		ArrayList<State> statesAutomaton = new ArrayList<State>();
+		ArrayList<State> finalStatesAutomaton = new ArrayList<State>();
+		for (String st : statesList) {
+			statesAutomaton.add(new State(st));
+			
+		}
+		
+		for (String fst : finalStatesList) {
+			finalStatesAutomaton.add(new State(fst));
+			
+		}
+		auto.name = this.automataName.getText();
+		auto.states = statesAutomaton;
+		auto.inputAlphabet = alphabetList;
+		auto.stackAlphabet = new ArrayList<ArrayList<Character>>();
+		auto.stackAlphabet.add(stackAlphabetList);
+		auto.transitionRelation = this.transitionList;
+		auto.startState = new State ((String) initialState.getSelectedItem());
+		auto.startStackSymbols = new ArrayList<Character>();
+		auto.startStackSymbols.add((Character) this.initialStack.getSelectedItem());
+		auto.finalStates = finalStatesAutomaton;
+		
+		return auto;
 	}
 	
 	public void resetAll() {
@@ -361,18 +492,65 @@ public class MainFrame extends JFrame{
 		this.textState.setText("");
 		this.initialState.removeAll();
 		this.statesLabel.setText("  States:");
+//			@Override
+//			public void stateChanged(ChangeEvent e) {
+//				
+//				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+//
+//					initialPiles[i].setBounds(25 + 75*i, 125, 50, 20);
+//					initialRuleState.setBounds(25, 325, 50, 20);
+//					initialRuleAlphabet.setBounds(100, 325, 50, 20);
+//					initialRulePile[i].setBounds(175 + 75*i, 325, 50, 20);
+//					finalRuleState.setBounds(250 + 75*i, 325, 50, 20);
+//					
+//					for (int j = 0;j<(Integer.parseInt(numberOfPiles.getValue().toString()));j++) {
+//						finalRulePile[i].setBounds(325 + 75 * j+ 75*i , 325, 50, 20);
+//						addTransition.setBounds(425 + 75*i + 75*j , 325, 45, 20);	
+//					}
+//					initialRulePile[i].addActionListener(new ActionListener() {
+//						public void actionPerformed(ActionEvent arg0) {
+//							stackTransition();
+//						}
+//					});
+//				}
+//				
+//				
+//
+//			}
+//		});
 		
 		this.textAlphabet.setText("");
 		this.alphabetLabel.setText("  Alphabet:");
-		
-		this.numberOfPiles.setValue(1);;
+		this.numberOfPiles.setValue(1);
 		
 		this.textStackAlphabet.setText("");
 		this.stackAlphabetLabel.setText("  Stack Alphabet:");
 		this.initialStack.removeAll();
-		
 		this.finalStates.removeAll();
 		this.finalStatesLabel.setText("  Final States:");
 	}
-
+	
+	public void stackTransition() {
+			for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+				if (stackAlphabetList.size() > 0 && initialRuleStack.getSelectedItem() != null) {
+				finalRuleStackAction.removeAllItems();
+				finalRuleStackAction.addItem(new StackAction(
+						initialRuleStack.getSelectedItem().toString().charAt(0), 
+						StackAction.DO_NOTHING)
+				);
+				for (Character ch : stackAlphabetList) {
+					finalRuleStackAction.addItem(new StackAction(
+							initialRuleStack.getSelectedItem().toString().charAt(0), 
+							ch)
+					);
+				}
+				finalRuleStackAction.addItem(new StackAction(
+						initialRuleStack.getSelectedItem().toString().charAt(0), 
+						StackAction.REMOVE)
+				);
+				
+			}
+		}
+		
+	}
 }

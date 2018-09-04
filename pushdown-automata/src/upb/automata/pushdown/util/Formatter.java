@@ -16,6 +16,18 @@ public class Formatter {
 		return builder.toString();
 	}
 	
+	public static <T> String arrayToStringLines(T[] arr){
+		StringBuilder builder = new StringBuilder();
+    	builder.append("  ");
+    	for (int i = 0; i < arr.length; i++) {
+		    builder.append(arr[i]);
+		    if (i < arr.length - 1) {
+		    	builder.append("\n  ");
+		    }
+		}
+		return builder.toString();
+	}
+	
 	public static String actionToString(Character value, Character action) {
 		if (action.equals(StackAction.REMOVE)) {
 			return "\u03BB";
