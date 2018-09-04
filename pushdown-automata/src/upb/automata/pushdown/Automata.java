@@ -7,6 +7,8 @@ public class Automata {
 	public static final Character EPSILON = '-';
 	
 	public String description;
+	public String name;
+	
 	ArrayList<State> states;
 	ArrayList<Character> inputAlphabet;
 	ArrayList<ArrayList<Character>> stackAlphabet;
@@ -23,5 +25,10 @@ public class Automata {
 			stacks.add(stack);
 		}
 		return stacks;			
+	}
+	
+	@Override
+	public String toString() {
+		return this.name;
 	}
 }
