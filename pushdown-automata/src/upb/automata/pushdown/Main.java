@@ -10,6 +10,7 @@ public class Main {
 		ArrayList<Automata> arr = a.loadAllAutomata();
 		//for(Automata automata : arr) {
 		//SimulatorFrame sf = new SimulatorFrame(arr.get(2));
+		SimulatorFrame sf = new SimulatorFrame(arr.get(3));
 		//}
 		MainFrame myFrame = new MainFrame();
 	}

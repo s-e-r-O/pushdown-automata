@@ -52,20 +52,38 @@ public class Simulator {
 		Character i = input.length() > 0? input.charAt(0) : Automata.EPSILON; 
 		Character[] z = this.getLastValues(stacks);
 		if (i == Automata.EPSILON) {
-			if (this.automata.finalStates.indexOf(state) >= 0 || checkIfEmpty(z)) {
-				this.correctSteps.add(new Step(state, input, stacks));
+			if (this.automata.finalStates.indexOf(state) >= 0) {
+				this.allSteps.add(new Step(state, input, stacks, Step.ACCEPTED_STATE_STEP));
+				this.correctSteps.add(new Step(state, input, stacks, Step.ACCEPTED_STATE_STEP));
+				return true;
+			} 
+			if (checkIfEmpty(z)) {
+				this.allSteps.add(new Step(state, input, stacks, Step.EMPTY_STACK_STEP));
+				this.correctSteps.add(new Step(state, input, stacks, Step.EMPTY_STACK_STEP));
 				return true;
 			}
 		}
+		boolean found = false;
 		for (TransitionFunction transition : this.automata.transitionRelation) {
-			this.allSteps.add(new Step(state, input, stacks, transition));
-			if ((transition.check(state, Automata.EPSILON, z) 
-					&& this.verify(transition.step, input, transition.modifyStack(stacks)))
-					|| (i != Automata.EPSILON && transition.check(state, i, z) 
-					&& this.verify(transition.step, input.substring(1), transition.modifyStack(stacks)))) {
-				this.correctSteps.add(new Step(state, input, stacks, transition));
-				return true;
+			if (transition.check(state, Automata.EPSILON, z)){
+				found = true;
+				this.allSteps.add(new Step(state, input, stacks, transition, Step.RULE_FOUND));
+				if (this.verify(transition.step, input, transition.modifyStack(stacks))) {
+					this.correctSteps.add(new Step(state, input, stacks, transition, Step.RULE_FOUND));
+					return true;
+				}
+			} 
+			if (i != Automata.EPSILON && transition.check(state, i, z)){
+				found = true;
+				this.allSteps.add(new Step(state, input, stacks, transition, Step.RULE_FOUND));
+				if (this.verify(transition.step, input.substring(1), transition.modifyStack(stacks))) {
+					this.correctSteps.add(new Step(state, input, stacks, transition, Step.RULE_FOUND));
+					return true;
+				}
 			}			
+		}
+		if (!found) {
+			this.allSteps.add(new Step(state, input, stacks, Step.RULE_NOT_FOUND));			
 		}
 		return false;
 	}
