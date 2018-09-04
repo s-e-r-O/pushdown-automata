@@ -31,7 +31,7 @@ public class MainFrame extends JFrame{
 
 	JLabel labelStates = new JLabel();
 	
-	String[] alphabet = {};
+	Character[] alphabet = {};
 	ArrayList<Character> alphabetList = new ArrayList<>();
 	TextField textAlphabet = new TextField();
 	JButton addLetter = new JButton();
@@ -42,7 +42,7 @@ public class MainFrame extends JFrame{
 	
 	
 	
-	String[] pileAlphabet = {};
+	Character[] pileAlphabet = {};
 	ArrayList<Character> pileAlphabetList = new ArrayList<>();
 	TextField textPileAlphabet = new TextField();
 	JButton addPileLetter = new JButton();
@@ -191,6 +191,7 @@ public class MainFrame extends JFrame{
 		addPileLetter.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
 				pileAlphabetList.add(textPileAlphabet.getText().toCharArray()[0]);
+				System.out.println(pileAlphabetList);
 				pileAlphabet = pileAlphabetList.toArray(pileAlphabet);
 //				for(String s : states)
 //				    System.out.println(s);
