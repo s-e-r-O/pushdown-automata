@@ -58,20 +58,24 @@ public class MainFrame extends JFrame{
 	
 	JComboBox initialRuleState = new JComboBox(states);
 	JComboBox initialRuleAlphabet = new JComboBox(alphabet);
-	JComboBox initialRulePile = new JComboBox(pileAlphabet);
+	JComboBox[] initialRulePile = {new JComboBox(),new JComboBox(),new JComboBox(),new JComboBox()};
 	JComboBox finalRuleState = new JComboBox(states);
-	JComboBox finalRulePile = new JComboBox(pileAlphabet);
+	JComboBox[] finalRulePile = {new JComboBox(),new JComboBox(),new JComboBox(),new JComboBox()};
+	
+
+	JButton addTransition = new JButton();
 	
 	JButton nextView = new JButton();
 
-	
+	ArrayList<Character> initialRuleStacks = new ArrayList<Character>();
+	ArrayList<Character> finalRuleStacks = new ArrayList<Character>();
 	//Automata Inputs
 	String description;
-	ArrayList<State> statesAutomaton;
-	ArrayList<TransitionFunction> transitionRelation;
-	ArrayList<ArrayList<Character>> stackAlphabet;
-	ArrayList<Character> startStackSymbols;
-	ArrayList<State> finalStatesAutomaton;
+	ArrayList<State> statesAutomaton = new ArrayList<>();
+	ArrayList<TransitionFunction> transitionRelation = new ArrayList<>();
+	ArrayList<ArrayList<Character>> stackAlphabet = new ArrayList<>();
+	ArrayList<Character> startStackSymbols = new ArrayList<>();
+	ArrayList<State> finalStatesAutomaton = new ArrayList<>();
 	
 	
 	
@@ -105,9 +109,12 @@ public class MainFrame extends JFrame{
 
 		initialRuleState.setBounds(25, 325, 50, 20);
 		initialRuleAlphabet.setBounds(100, 325, 50, 20);
-		initialRulePile.setBounds(175, 325, 50, 20);
+		initialRulePile[0].setBounds(175, 325, 50, 20);
 		finalRuleState.setBounds(250, 325, 50, 20);
-		finalRulePile.setBounds(315, 325, 50, 20);
+		finalRulePile[0].setBounds(325, 325, 50, 20);
+	
+		addTransition.setBounds(425, 325, 45, 20);
+		addTransition.setText("+");
 		
 
 		nextView.setBounds(1300,600,100,20);
@@ -137,9 +144,16 @@ public class MainFrame extends JFrame{
 		
 		myFrame.add(initialRuleState);
 		myFrame.add(initialRuleAlphabet);
-		myFrame.add(initialRulePile);
+		myFrame.add(initialRulePile[0]);
+		myFrame.add(initialRulePile[1]);
+		myFrame.add(initialRulePile[2]);
+		myFrame.add(initialRulePile[3]);
 		myFrame.add(finalRuleState);
-		myFrame.add(finalRulePile);
+		myFrame.add(finalRulePile[0]);
+		myFrame.add(finalRulePile[1]);
+		myFrame.add(finalRulePile[2]);
+		myFrame.add(finalRulePile[3]);
+		myFrame.add(addTransition);
 
 		myFrame.add(nextView);
 		
@@ -150,6 +164,8 @@ public class MainFrame extends JFrame{
 	}
 	
 	public void setBehavior() {
+
+		
 		addStates.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
 				statesList.add(textState.getText());
@@ -163,17 +179,37 @@ public class MainFrame extends JFrame{
 			}
 		});
 		
+		initialRulePile[0].addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				stackTransition();
+			}
+		});
+		
 		numberOfPiles.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-
-				System.out.println("click bitch");
 				
 				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
 
 					initialPiles[i].setBounds(25 + 75*i, 125, 50, 20);
+					initialRuleState.setBounds(25, 325, 50, 20);
+					initialRuleAlphabet.setBounds(100, 325, 50, 20);
+					initialRulePile[i].setBounds(175 + 75*i, 325, 50, 20);
+					finalRuleState.setBounds(250 + 75*i, 325, 50, 20);
+					
+					for (int j = 0;j<(Integer.parseInt(numberOfPiles.getValue().toString()));j++) {
+						finalRulePile[i].setBounds(325 + 75 * j+ 75*i , 325, 50, 20);
+						addTransition.setBounds(425 + 75*i + 75*j , 325, 45, 20);	
+					}
+					initialRulePile[i].addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							stackTransition();
+						}
+					});
 				}
+				
+				
 
 			}
 		});
@@ -188,6 +224,7 @@ public class MainFrame extends JFrame{
 			}
 		});
 		
+		
 		addPileLetter.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
 				pileAlphabetList.add(textPileAlphabet.getText().toCharArray()[0]);
@@ -197,9 +234,10 @@ public class MainFrame extends JFrame{
 //				    System.out.println(s);
 				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
 
+					initialRulePile[i].addItem(textPileAlphabet.getText());
 					initialPiles[i].addItem(textPileAlphabet.getText());
 				}
-				initialRulePile.addItem(textPileAlphabet.getText());
+				//stackTransition();
 			}
 		});
 		
@@ -210,6 +248,31 @@ public class MainFrame extends JFrame{
 //				for(String s : states)
 //				    System.out.println(s);
 				finalStatesLabel.append("\n" + (String) acceptedStates.getSelectedItem());
+			}
+		});
+		
+		addTransition.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){
+				if (initialRuleStacks != null) {
+					initialRuleStacks.clear();					
+				}
+				if (finalRuleStacks != null) {
+					finalRuleStacks.clear();					
+				}
+				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+					initialRuleStacks.add(initialRulePile[i].getSelectedItem().toString().charAt(0));
+				}
+				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+					finalRuleStacks.add(((StackAction) finalRulePile[i].getSelectedItem()).action);
+				}
+				System.out.println(initialRuleStacks);
+				transitionRelation.add(new TransitionFunction(
+						new State( initialRuleState.getSelectedItem().toString()),
+						initialRuleAlphabet.getSelectedItem().toString().charAt(0), 
+						initialRuleStacks.toArray(new Character[finalRuleStacks.size()]),
+						new State( finalRuleState.getSelectedItem().toString()),
+						finalRuleStacks.toArray(new Character[finalRuleStacks.size()])));
+				System.out.println(transitionRelation);
 			}
 		});
 		
@@ -233,13 +296,26 @@ public class MainFrame extends JFrame{
 				auto.startStackSymbols = startStackSymbols;
 				auto.finalStates = finalStatesAutomaton;
 				
-				
-				
+				SimulatorFrame sf = new SimulatorFrame(auto);
 			}
 		});
+	}
+	
+	public void stackTransition() {
 		
 		
+		
+			for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+				if (pileAlphabetList != null && initialRulePile[i].getSelectedItem() != null) {
+				finalRulePile[i].removeAllItems();
+				finalRulePile[i].addItem(new StackAction(initialRulePile[i].getSelectedItem().toString().charAt(0), StackAction.DO_NOTHING));
+				for (Character ch : pileAlphabetList) {
+					finalRulePile[i].addItem(new StackAction(initialRulePile[i].getSelectedItem().toString().charAt(0),ch));
+				}
+				finalRulePile[i].addItem(new StackAction(initialRulePile[i].getSelectedItem().toString().charAt(0),StackAction.REMOVE));
+				
+			}
+		}
 		
 	}
-
 }

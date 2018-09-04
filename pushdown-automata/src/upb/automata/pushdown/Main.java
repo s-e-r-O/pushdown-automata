@@ -9,8 +9,7 @@ public class Main {
 		AutomataManager a = new AutomataManager();
 		ArrayList<Automata> arr = a.loadAllAutomata();
 		//for(Automata automata : arr) {
-		//SimulatorFrame sf = new SimulatorFrame(arr.get(2));
-		SimulatorFrame sf = new SimulatorFrame(arr.get(3));
+		//SimulatorFrame sf = new SimulatorFrame(arr.get(3));
 		//}
 		MainFrame myFrame = new MainFrame();
 	}
