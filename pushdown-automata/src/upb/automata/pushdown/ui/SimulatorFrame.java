@@ -37,6 +37,7 @@ public class SimulatorFrame extends JFrame {
 		super();
 		this.setLayout(new GridBagLayout());
 		this.setTitle(automata.description);
+		this.setFocusable(true);
 		this.steps = new ArrayList<Step>();
 		this.index = 0;
 		this.simulator = new Simulator(automata);
@@ -171,8 +172,9 @@ public class SimulatorFrame extends JFrame {
 	}
 	
 	public void run() {
-		boolean isCorrect = simulator.run(inputField.getText());
+		simulator.run(inputField.getText());
 		this.getSteps();
+		this.requestFocus();
 	}
 	
 	private void changeStep(Integer direction) {
