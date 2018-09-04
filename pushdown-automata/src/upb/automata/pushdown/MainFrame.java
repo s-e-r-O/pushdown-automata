@@ -179,6 +179,8 @@ public class MainFrame extends JFrame{
 			}
 		});
 		
+		initialRuleAlphabet.addItem(Automata.EPSILON);
+		
 		initialRulePile[0].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				stackTransition();
@@ -237,7 +239,7 @@ public class MainFrame extends JFrame{
 					initialRulePile[i].addItem(textPileAlphabet.getText());
 					initialPiles[i].addItem(textPileAlphabet.getText());
 				}
-				//stackTransition();
+				stackTransition();
 			}
 		});
 		
@@ -278,14 +280,20 @@ public class MainFrame extends JFrame{
 		
 		nextView.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){
-				for (String st : states) {
+				for (String st : statesList) {
 					statesAutomaton.add(new State(st));
 					
 				}
 				
-				for (String fst : finalStates) {
+				for (String fst : finalStatesList) {
 					finalStatesAutomaton.add(new State(fst));
 					
+				}
+				
+				stackAlphabet.add(alphabetList);
+				
+				for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+					startStackSymbols.add(initialPiles[i].getSelectedItem().toString().charAt(0));
 				}
 				Automata auto = new Automata();
 				auto.states = statesAutomaton;
@@ -295,6 +303,8 @@ public class MainFrame extends JFrame{
 				auto.startState = new State ((String) initialState.getSelectedItem());
 				auto.startStackSymbols = startStackSymbols;
 				auto.finalStates = finalStatesAutomaton;
+				
+				System.out.println(auto);
 				
 				SimulatorFrame sf = new SimulatorFrame(auto);
 			}
@@ -317,5 +327,23 @@ public class MainFrame extends JFrame{
 			}
 		}
 		
+	}
+	
+	public boolean checkEmptiness() {
+		boolean isEmpty = false;
+		if (statesList.size() <= 0 || initialState.getSelectedItem() == null || alphabetList.size() <= 0 
+				|| pileAlphabetList.size() <= 0 || finalStatesList.size() <= 0 || initialRuleState.getSelectedItem() == null
+				|| initialRuleAlphabet.getSelectedItem() == null || finalRuleState.getSelectedItem() == null
+				|| transitionRelation.size() <= 0 
+				) {
+			isEmpty = true;
+		}
+		for (int i = 0;i<(Integer.parseInt(numberOfPiles.getValue().toString()));i++) {
+			if (initialRulePile[i].getSelectedItem() == null || finalRulePile[i].getSelectedItem() == null || initialPiles[i].getSelectedItem() == null) {
+				isEmpty = true;
+				break;
+			}
+		} 
+		return isEmpty;
 	}
 }
